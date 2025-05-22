@@ -1,0 +1,42 @@
+{
+    "name": "intermax/blur",
+    "description": "Package for Laravel to help obfuscate your database.",
+    "type": "library",
+    "require": {
+        "php": "^8.3",
+        "laravel/framework": "^11.0 | ^12.0",
+        "fakerphp/faker": "^1.0",
+        "laravel/prompts": "^0.3.5"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.22",
+        "larastan/larastan": "^3.4",
+        "pestphp/pest": "^3.8",
+        "orchestra/testbench": "^10.3"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Intermax\\Blur\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Patrick Hoogkamer",
+            "email": "p.hoogkamer@intermax.nl"
+        }
+    ],
+    "minimum-stability": "stable",
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Intermax\\Blur\\BlurServiceProvider"
+            ]
+        }
+    }
+}
