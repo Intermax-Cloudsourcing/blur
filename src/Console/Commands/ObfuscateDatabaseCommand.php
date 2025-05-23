@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Intermax\Blur\Console\Commands;
 
+use Illuminate\Support\Arr;
 use Intermax\Blur\Obfuscators\FakerObfuscator;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\App;
@@ -44,33 +45,51 @@ class ObfuscateDatabaseCommand extends Command
             $this->components->error('Environment is production, stopping.');
         }
 
-        $tableNames = DB::connection()->getDoctrineSchemaManager()->listTableNames();
+        $tableNames = Arr::pluck(DB::connection()->getSchemaBuilder()->getTables(), 'name');
 
         foreach ($tableNames as $tableName) {
-            if (! in_array($tableName, array_keys(config('obfuscate.tables')))) {
+            if (! in_array($tableName, array_keys(config('blur.tables')))) {
                 continue;
             }
 
-            $chunkSize = config('obfuscate.tables.' . $tableName . '.chunk_size', 2000);
+            $chunkSize = config('blur.tables.' . $tableName . '.chunk_size', 2000);
 
-            $keys = config('obfuscate.tables.' . $tableName . '.keys');
+            $keys = config('blur.tables.' . $tableName . '.keys');
 
             if ($keys !== null) {
                 $primaryColumns = $keys;
             } else {
-                $indexes = DB::connection()->getDoctrineSchemaManager()->listTableIndexes($tableName);
+                $indexes = DB::connection()->getSchemaBuilder()->getIndexes($tableName);
 
-                $primaryColumns = $indexes['primary']->getColumns();
+                $primaryColumns = Arr::where($indexes, fn ($value) => $value['name'] === 'primary')['columns'] ?? ['id'];
             }
 
-            $progress = progress(label: 'Obfuscating table ' . $tableName . '...', steps: DB::table($tableName)->count());
+            $method = config('blur.tables.' . $tableName . '.method', 'upsert');
 
-            DB::table($tableName)->orderBy($primaryColumns[0])->chunk($chunkSize, function ($records) use ($tableName, $progress, $primaryColumns) {
+            if ($method === 'empty') {
+                DB::table($tableName)->delete();
+
+                $this->components->info('Table ' . $tableName . ' truncated.');
+
+                continue;
+            }
+
+            $count = DB::table($tableName)->count();
+
+            if ($count === 0) {
+                $this->components->info('Table ' . $tableName . ' is empty.');
+
+                continue;
+            }
+
+            $progress = progress(label: 'Obfuscating table ' . $tableName . '...', steps: $count);
+
+            DB::table($tableName)->orderBy($primaryColumns[0])->chunkById(500, function ($records) use ($tableName, $progress, $primaryColumns) {
                 $continueFromTable = $this->option('continue-from-table');
                 if ($continueFromTable !== null) {
 
                 }
-                $fields = config('obfuscate.tables.'.$tableName.'.columns', []);
+                $fields = config('blur.tables.'.$tableName.'.columns', []);
 
                 $updates = [];
 
@@ -128,7 +147,7 @@ class ObfuscateDatabaseCommand extends Command
      */
     public function applyModifiers(string $tableName, array $update): array
     {
-        $modifiers = config('obfuscate.tables.'.$tableName.'.modifiers', []);
+        $modifiers = config('blur.tables.'.$tableName.'.modifiers', []);
 
         foreach ($modifiers as $modifierClass) {
             $modifier = App::make($modifierClass);
