@@ -13,12 +13,14 @@
         "laravel/pint": "^1.22",
         "larastan/larastan": "^3.4",
         "pestphp/pest": "^3.8",
-        "orchestra/testbench": "^10.3"
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest-plugin-laravel": "^3.2"
     },
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Intermax\\Blur\\": "src/"
+            "Intermax\\Blur\\": "src/",
+            "Intermax\\Blur\\Tests\\": "tests/"
         }
     },
     "authors": [
