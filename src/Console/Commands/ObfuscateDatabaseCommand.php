@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Intermax\Blur\Contracts\Obfuscator;
 use Intermax\Blur\Obfuscators\FakerObfuscator;
 
+use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\progress;
 
 class ObfuscateDatabaseCommand extends Command
@@ -18,7 +19,7 @@ class ObfuscateDatabaseCommand extends Command
     /**
      * @var string
      */
-    protected $signature = 'blur:obfuscate';
+    protected $signature = 'blur:obfuscate {--i|interactive : Select which tables to obfuscate interactively}';
 
     /**
      * The console command description.
@@ -36,15 +37,46 @@ class ObfuscateDatabaseCommand extends Command
     {
         if (App::environment('production')) {
             $this->components->error('Environment is production, stopping.');
+
+            return 1;
         }
 
         $tableNames = Arr::pluck(DB::connection()->getSchemaBuilder()->getTables(), 'name');
+        $configuredTables = array_keys(config('blur.tables'));
+        $tablesToProcess = [];
 
+        // Filter tables that are configured in blur.tables
         foreach ($tableNames as $tableName) {
-            if (! in_array($tableName, array_keys(config('blur.tables')))) {
-                continue;
+            if (in_array($tableName, $configuredTables)) {
+                $tablesToProcess[$tableName] = $tableName;
+            }
+        }
+
+        if (empty($tablesToProcess)) {
+            $this->components->error('No tables configured for obfuscation. Check your blur.php config file.');
+
+            return 1;
+        }
+
+        // If interactive mode is enabled, let the user select which tables to obfuscate
+        if ($this->option('interactive')) {
+            $selectedTables = multiselect(
+                label: 'Select tables to obfuscate',
+                options: $tablesToProcess,
+                scroll: 10,
+                hint: 'Use the space bar to select tables to obfuscate.'
+            );
+
+            if (empty($selectedTables)) {
+                $this->components->info('No tables selected for obfuscation.');
+
+                return 0;
             }
 
+            $tablesToProcess = array_intersect_key($tablesToProcess, array_flip($selectedTables));
+        }
+
+        foreach ($tablesToProcess as $tableName) {
             $chunkSize = config('blur.tables.'.$tableName.'.chunk_size', 2000);
 
             $keys = config('blur.tables.'.$tableName.'.keys');
