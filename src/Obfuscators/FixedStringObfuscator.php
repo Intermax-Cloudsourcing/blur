@@ -10,9 +10,9 @@ use InvalidArgumentException;
 class FixedStringObfuscator implements Obfuscator
 {
     /**
-     * @param array<int, mixed>|null $parameters
+     * @param  array<int, mixed>|null  $parameters
      */
-    public function generate(array|null $parameters = null): mixed
+    public function generate(?array $parameters = null): mixed
     {
         if ($parameters === null) {
             throw new InvalidArgumentException('No fixed value provided.');

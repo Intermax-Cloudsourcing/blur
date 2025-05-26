@@ -9,5 +9,5 @@ interface Obfuscator
     /**
      * @param  array<int, mixed>|null  $parameters
      */
-    public function generate(array|null $parameters = null): mixed;
+    public function generate(?array $parameters = null): mixed;
 }
