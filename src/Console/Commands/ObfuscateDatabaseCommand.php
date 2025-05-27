@@ -74,7 +74,7 @@ class ObfuscateDatabaseCommand extends Command
                 return 0;
             }
 
-            $tablesToProcess = array_intersect_key($tablesToProcess, array_flip($selectedTables));
+            $tablesToProcess = $selectedTables;
         }
 
         foreach ($tablesToProcess as $tableName) {
