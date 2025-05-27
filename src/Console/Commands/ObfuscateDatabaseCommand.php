@@ -90,12 +90,12 @@ class ObfuscateDatabaseCommand extends Command
                 $primaryColumns = Arr::where($indexes, fn ($value) => $value['name'] === 'primary')['columns'] ?? ['id'];
             }
 
-            $method = config('blur.tables.'.$tableName.'.method', 'upsert');
+            $method = config('blur.tables.'.$tableName.'.method', 'update');
 
-            if ($method === 'empty') {
+            if ($method === 'clear') {
                 DB::table($tableName)->delete();
 
-                $this->components->info('Table '.$tableName.' truncated.');
+                $this->components->info('Table '.$tableName.' cleared.');
 
                 continue;
             }

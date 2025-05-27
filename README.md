@@ -46,9 +46,9 @@ return [
                 'email' => 'faker:email',
                 // Add more columns as needed
             ],
-            'chunk_size' => 2000, // Optional: Set a custom chunk size for processing
-            // 'keys' => ['id'], // Optional: Specify primary key columns if not using 'id'
-            // 'method' => 'upsert', // Optional: Use 'empty' to truncate the table instead
+            // 'chunk_size' => 2000, // Optional: Set a custom chunk size for processing
+            // 'keys' => ['id'], // Optional: Specify when the automatic discovery won't work
+            // 'method' => 'update', // Optional: Use 'clear' to truncate the table instead
         ],
         // Add more tables as needed
     ],
@@ -58,10 +58,10 @@ return [
 ### Configuration Options
 
 - **tables**: An array of tables to obfuscate
-  - **columns**: The columns to obfuscate and the obfuscation method to use
-  - **chunk_size**: (Optional) The number of records to process at once (default: 2000)
-  - **keys**: (Optional) The primary key columns (default: ['id'])
-  - **method**: (Optional) The method to use for obfuscation (default: 'upsert', alternative: 'empty' to truncate. This can be useful for tables like `jobs` or tables that store audit logs.)
+  - **columns**: The columns to obfuscate and the obfuscation method to use. Only columns that should be obfuscated need to be specified.
+  - **chunk_size**: (Optional) The number of records to process at once (default: 2000). See [Performance Considerations](#performance-considerations)
+  - **keys**: (Optional) The key columns to use. The key columns are discovered when obfuscating, but if that fails (for example when there are no primary keys) the unique 'key' can be specified.
+  - **method**: (Optional) The method to use for obfuscation (default: 'update', alternative: 'clear' to clear the table. This can be useful for tables like `jobs` or tables that store audit logs.)
 
 ## Usage
 
