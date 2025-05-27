@@ -22,19 +22,26 @@ it('obfuscates the database with faker data', function () {
         ],
     ]);
 
-    $users = DB::table('users')->orderBy('id')->get();
+    $users = DB::table('users')->orderBy('id')->get()->keyBy('id');
+
+    fake()->seed(1234);
 
     artisan('blur:obfuscate')->assertOk();
 
     $obfuscatedUsers = DB::table('users')->orderBy('id')->get();
 
-    foreach ($users as $index => $user) {
-        expect($user)
-            ->username->not->toBe($obfuscatedUsers[$index]->username)
-            ->name->not->toBe($obfuscatedUsers[$index]->name)
-            ->password->toBe($obfuscatedUsers[$index]->password)
-            ->created_at->toBe($obfuscatedUsers[$index]->created_at)
-            ->updated_at->toBe($obfuscatedUsers[$index]->updated_at);
+    $seededObfuscatedUsers = seededObfuscatedUsers();
+
+    foreach ($obfuscatedUsers as $key => $obfuscatedUser) {
+        expect($obfuscatedUser)
+            // Username and name are obfuscated
+            ->username->toBe($seededObfuscatedUsers[$key]['username'])
+            ->name->toBe($seededObfuscatedUsers[$key]['name'])
+
+            // Password, created_at and updated_at are not obfuscated
+            ->password->toBe($users[$obfuscatedUser->id]->password)
+            ->created_at->toBe($users[$obfuscatedUser->id]->created_at)
+            ->updated_at->toBe($users[$obfuscatedUser->id]->updated_at);
     }
 });
 
@@ -82,4 +89,35 @@ function insertUsers(): void
             'updated_at' => '2023-09-01 19:45:10',
         ],
     ]);
+}
+
+function seededObfuscatedUsers(): array
+{
+    return [
+        [
+            'id' => 1,
+            'username' => 'gbailey',
+            'name' => 'Macey Rempel PhD',
+        ],
+        [
+            'id' => 2,
+            'username' => 'justina.gaylord',
+            'name' => 'Misael Runte',
+        ],
+        [
+            'id' => 3,
+            'username' => 'aschuster',
+            'name' => 'Haven Romaguera',
+        ],
+        [
+            'id' => 4,
+            'username' => 'antonio24',
+            'name' => 'Miss Pearl Hauck',
+        ],
+        [
+            'id' => 5,
+            'username' => 'leo34',
+            'name' => 'Ferne Fritsch',
+        ],
+    ];
 }
