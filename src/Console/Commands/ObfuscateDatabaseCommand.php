@@ -153,7 +153,7 @@ class ObfuscateDatabaseCommand extends Command
         $count = DB::table($tableName)->count();
 
         if ($count === 0) {
-            $this->components->info('Table '.$tableName.' is empty.');
+            $this->components->info('Table "'.$tableName.'" is empty.');
 
             return;
         }
