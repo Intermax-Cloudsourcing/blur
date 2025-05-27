@@ -158,7 +158,7 @@ class ObfuscateDatabaseCommand extends Command
             return;
         }
 
-        $progress = progress(label: 'Obfuscating table '.$tableName.'...', steps: $count);
+        $progress = progress(label: 'Obfuscating table "'.$tableName.'"...', steps: $count);
 
         DB::table($tableName)->orderBy($primaryColumns[0])->chunkById($chunkSize, function (Collection $records) use ($tableName, $progress, $primaryColumns, $chunkSize) {
             $fields = config('blur.tables.'.$tableName.'.columns', []);
