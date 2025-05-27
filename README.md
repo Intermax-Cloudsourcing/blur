@@ -46,7 +46,7 @@ return [
                 'email' => 'faker:email',
                 // Add more columns as needed
             ],
-            // 'chunk_size' => 2000, // Optional: Set a custom chunk size for processing
+            // 'chunk_size' => 2000, // Optional: Set a chunk size; higher is faster but will use more memory
             // 'keys' => ['id'], // Optional: Specify when the automatic discovery won't work
             // 'method' => 'update', // Optional: Use 'clear' to truncate the table instead
         ],
@@ -70,6 +70,9 @@ To obfuscate your database, run the following command:
 ```bash
 php artisan blur:obfuscate
 ```
+
+
+> ⚠️ **This will change records (as you configured) for the default database connection.**
 
 ### Interactive Mode
 
