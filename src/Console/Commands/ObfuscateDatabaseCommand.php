@@ -6,6 +6,7 @@ namespace Intermax\Blur\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Intermax\Blur\Contracts\Obfuscator;
@@ -159,7 +160,7 @@ class ObfuscateDatabaseCommand extends Command
 
         $progress = progress(label: 'Obfuscating table '.$tableName.'...', steps: $count);
 
-        DB::table($tableName)->orderBy($primaryColumns[0])->chunkById($chunkSize, function ($records) use ($tableName, $progress, $primaryColumns, $chunkSize) {
+        DB::table($tableName)->orderBy($primaryColumns[0])->chunkById($chunkSize, function (Collection $records) use ($tableName, $progress, $primaryColumns, $chunkSize) {
             $fields = config('blur.tables.'.$tableName.'.columns', []);
 
             $batchSize = min(50, $chunkSize);
@@ -169,7 +170,7 @@ class ObfuscateDatabaseCommand extends Command
             foreach ($records as $record) {
                 $update = [];
 
-                foreach ($record as $column => $value) {
+                foreach ((array) $record as $column => $value) {
                     $update[$column] = $value;
                 }
 

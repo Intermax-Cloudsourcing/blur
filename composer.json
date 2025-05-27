@@ -6,8 +6,7 @@
         "php": "^8.3",
         "laravel/framework": "^11.0 | ^12.0",
         "fakerphp/faker": "^1.0",
-        "laravel/prompts": "^0.3.5",
-        "doctrine/dbal": "^4.2"
+        "laravel/prompts": "^0.3.5"
     },
     "require-dev": {
         "laravel/pint": "^1.22",
@@ -19,9 +18,27 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Intermax\\Blur\\": "src/",
+            "Intermax\\Blur\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Intermax\\Blur\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "lint": "vendor/bin/pint -v --test --ansi",
+        "fix": "vendor/bin/pint -v --ansi",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=-1 --ansi",
+        "test": "vendor/bin/pest --colors=always",
+        "prepare-commit": [
+            "@fix",
+            "@analyse",
+            "@test"
+        ],
+        "ci:fix": "@fix",
+        "ci:analyse": "@analyse --no-progress --error-format=github --no-interaction",
+        "ci:test": "vendor/bin/pest --ci --colors=never"
     },
     "authors": [
         {

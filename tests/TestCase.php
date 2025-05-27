@@ -13,4 +13,11 @@ abstract class TestCase extends BaseTestCase
             BlurServiceProvider::class,
         ];
     }
+
+    protected function defineDatabaseMigrations(): void
+    {
+        $this->loadMigrationsFrom(
+            __DIR__.'/Utilities/database/migrations'
+        );
+    }
 }
