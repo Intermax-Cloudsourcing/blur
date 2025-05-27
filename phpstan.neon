@@ -1,0 +1,13 @@
+includes:
+    - %currentWorkingDirectory%/vendor/larastan/larastan/extension.neon
+
+parameters:
+
+    paths:
+       - %currentWorkingDirectory%
+
+    level: 8
+
+    excludePaths:
+        - %currentWorkingDirectory%/tests/
+        - %currentWorkingDirectory%/vendor/
