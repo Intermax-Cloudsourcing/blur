@@ -58,7 +58,7 @@ return [
 ### Configuration Options
 
 - **tables**: An array of tables to obfuscate
-  - **columns**: The columns to obfuscate and the obfuscation method to use. Only columns that should be obfuscated need to be specified.
+  - **columns**: (Optional, can be omitted when the table needs to be cleared) The columns to obfuscate and the obfuscation method to use. Only columns that should be obfuscated need to be specified.
   - **chunk_size**: (Optional) The number of records to process at once (default: 2000). See [Performance Considerations](#performance-considerations)
   - **keys**: (Optional) The key columns to use. The key columns are discovered when obfuscating, but if that fails (for example when there are no primary keys) the unique 'key' can be specified.
   - **method**: (Optional) The method to use for obfuscation (default: 'update', alternative: 'clear' to clear the table. This can be useful for tables like `jobs` or tables that store audit logs.)
