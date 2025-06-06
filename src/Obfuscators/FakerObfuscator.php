@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Intermax\Blur\Obfuscators;
 
+use Faker;
 use Faker\Generator;
 use Intermax\Blur\Contracts\Obfuscator;
 use InvalidArgumentException;
 
 class FakerObfuscator implements Obfuscator
 {
-    private Generator $faker;
+    private static ?Generator $faker = null;
 
     public function __construct()
     {
-        // Create a single Faker instance to reuse
-        $this->faker = fake();
+        if (self::$faker === null) {
+            self::refreshFakerInstance();
+        }
     }
 
     /**
@@ -27,6 +29,11 @@ class FakerObfuscator implements Obfuscator
             throw new InvalidArgumentException('No faker method provided');
         }
 
-        return $this->faker->{$parameters[0]}();
+        return self::$faker->{$parameters[0]}();
+    }
+
+    public static function refreshFakerInstance(): void
+    {
+        self::$faker = Faker\Factory::create();
     }
 }

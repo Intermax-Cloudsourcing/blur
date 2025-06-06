@@ -191,29 +191,26 @@ class ObfuscateDatabaseCommand extends Command
 
                 // Process in smaller batches to reduce memory usage
                 if (count($updates) >= $batchSize) {
-                    DB::table($tableName)->upsert($updates, $primaryColumns, array_keys($fields));
+                    DB::table($tableName)->upsert($updates, $primaryColumns);
                     $progress->advance($processedCount);
 
                     $updates = [];
                     $processedCount = 0;
                     unset($update);
                 }
-
-                unset($record);
             }
 
             // Process any remaining updates
             if (count($updates) > 0) {
-                DB::table($tableName)->upsert($updates, $primaryColumns, array_keys($fields));
+                DB::table($tableName)->upsert($updates, $primaryColumns);
                 $progress->advance($processedCount);
                 unset($update);
             }
-
-            unset($records);
-        });
+        }, $primaryColumns[0]);
 
         $progress->finish();
 
         $this->obfuscatorInstances = [];
+        FakerObfuscator::refreshFakerInstance();
     }
 }
