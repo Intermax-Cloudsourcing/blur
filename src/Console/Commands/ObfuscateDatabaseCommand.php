@@ -80,15 +80,7 @@ class ObfuscateDatabaseCommand extends Command
         foreach ($tablesToProcess as $tableName) {
             $chunkSize = config('blur.tables.'.$tableName.'.chunk_size', 2000);
 
-            $keys = config('blur.tables.'.$tableName.'.keys');
-
-            if ($keys !== null) {
-                $primaryColumns = $keys;
-            } else {
-                $indexes = DB::connection()->getSchemaBuilder()->getIndexes($tableName);
-
-                $primaryColumns = Arr::where($indexes, fn ($value) => $value['name'] === 'primary')['columns'] ?? ['id'];
-            }
+            $primaryColumns = $this->primaryColumns($tableName);
 
             $method = config('blur.tables.'.$tableName.'.method', 'update');
 
@@ -146,7 +138,32 @@ class ObfuscateDatabaseCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $primaryColumns
+     * The configured keys of a table, or else the columns of its primary key, or else "id".
+     *
+     * @return non-empty-list<non-empty-string>
+     */
+    private function primaryColumns(string $tableName): array
+    {
+        $keys = config('blur.tables.'.$tableName.'.keys');
+
+        if ($keys !== null) {
+            return $keys;
+        }
+
+        $indexes = DB::connection()->getSchemaBuilder()->getIndexes($tableName);
+
+        $primaryIndex = Arr::first($indexes, fn (array $index) => $index['primary']);
+
+        $columns = array_values(array_filter(
+            $primaryIndex['columns'] ?? [],
+            fn (string $column) => $column !== '',
+        ));
+
+        return $columns === [] ? ['id'] : $columns;
+    }
+
+    /**
+     * @param  non-empty-list<non-empty-string>  $primaryColumns
      */
     private function obfuscateTable(string $tableName, array $primaryColumns, int $chunkSize): void
     {

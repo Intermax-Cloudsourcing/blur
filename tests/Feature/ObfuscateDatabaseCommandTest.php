@@ -45,6 +45,29 @@ it('obfuscates the database with faker data', function () {
     }
 });
 
+it('discovers a primary key that is not id', function () {
+    DB::table('countries')->insert([
+        ['code' => 'NL', 'name' => 'Netherlands'],
+        ['code' => 'BE', 'name' => 'Belgium'],
+        ['code' => 'DE', 'name' => 'Germany'],
+    ]);
+
+    Config::set('blur.tables', [
+        'countries' => [
+            'columns' => [
+                'name' => 'faker:country',
+            ],
+        ],
+    ]);
+
+    artisan('blur:obfuscate')->assertOk();
+
+    $countries = DB::table('countries')->orderBy('code')->get();
+
+    expect($countries->pluck('code')->all())->toBe(['BE', 'DE', 'NL'])
+        ->and($countries->pluck('name')->intersect(['Netherlands', 'Belgium', 'Germany']))->toBeEmpty();
+});
+
 function insertUsers(): void
 {
     DB::table('users')->insert([
