@@ -60,6 +60,9 @@ it('discovers a primary key that is not id', function () {
         ],
     ]);
 
+    // Seeded, as faker could otherwise pick one of the original names.
+    fake()->seed(1234);
+
     artisan('blur:obfuscate')->assertOk();
 
     $countries = DB::table('countries')->orderBy('code')->get();
