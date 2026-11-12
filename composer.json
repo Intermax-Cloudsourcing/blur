@@ -4,16 +4,16 @@
     "type": "library",
     "require": {
         "php": "^8.3",
-        "laravel/framework": "^11.0 | ^12.0",
+        "laravel/framework": "^11.0 | ^12.0 | ^13.0",
         "fakerphp/faker": "^1.0",
         "laravel/prompts": "^0.3.5"
     },
     "require-dev": {
         "laravel/pint": "^1.22",
         "larastan/larastan": "^3.4",
-        "pestphp/pest": "^3.8",
-        "orchestra/testbench": "^10.3",
-        "pestphp/pest-plugin-laravel": "^3.2"
+        "pestphp/pest": "^3.8 | ^4.0",
+        "orchestra/testbench": "^10.3 | ^11.0",
+        "pestphp/pest-plugin-laravel": "^3.2 | ^4.0"
     },
     "license": "MIT",
     "autoload": {
